@@ -1,0 +1,70 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# VSCode (si no quieres compartir config personal de editor)
+.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android
+/android/.gradle/
+/android/captures/
+/android/app/build/
+/android/local.properties   # 🔑 contiene rutas locales de SDK
+/android/key.properties     # 🔑 NO subir claves de firma
+
+# iOS
+ios/Pods/
+/ios/.symlinks/
+/ios/Flutter/Flutter.framework
+/ios/Flutter/Flutter.podspec
+/ios/Flutter/App.framework
+/ios/Flutter/Generated.xcconfig
+/ios/Flutter/ephemeral/
+/ios/build/
+/ios/.generated/
+
+# Fastlane (si usas)
+/fastlane/report.xml
+/fastlane/Preview.html
+/fastlane/screenshots
+
+# Env & secrets
+*.env
+*.key
+*.keystore
+google-services.json        # 🔑 Android Firebase config
+GoogleService-Info.plist    # 🔑 iOS Firebase config
