@@ -4,6 +4,7 @@ import 'package:nutri_kids_movil/providers/auth_provider.dart';
 import 'package:nutri_kids_movil/ui/views/dashboard_view.dart';
 import 'package:nutri_kids_movil/ui/views/forgot_password_view.dart';
 import 'package:nutri_kids_movil/ui/views/login_view.dart';
+import 'package:nutri_kids_movil/ui/views/register_view.dart';
 import 'package:nutri_kids_movil/ui/views/reset_password_view.dart';
 import 'package:nutri_kids_movil/ui/views/verify_pin_view.dart';
 import 'package:provider/provider.dart';
@@ -52,6 +53,17 @@ class AdminHandlers {
       final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
       final email = args != null && args.containsKey('email') ? args['email'] as String : '';
       return ResetPasswordView(email: email);
+    }
+  });
+
+  static Handler register = Handler(handlerFunc: (context, parameters) {
+    final authProvider = Provider.of<AuthProvider>(context!);
+    if (authProvider.authStatus == AuthStatus.authenticated) {
+      // return const AdminDashboardPage();
+      return const DashboardView();
+    } else {
+      // Aquí deberías retornar la vista de registro cuando esté implementada
+      return const RegisterView(); // Temporalmente redirige al login
     }
   });
 }

@@ -7,6 +7,7 @@ import 'package:nutri_kids_movil/services/hive_services.dart';
 import 'package:nutri_kids_movil/services/local_storage.dart';
 import 'package:nutri_kids_movil/services/navigation_services.dart';
 import 'package:nutri_kids_movil/ui/layouts/auth/auth_layout.dart';
+import 'package:nutri_kids_movil/ui/layouts/dashboard/dashboard_layout.dart';
 import 'package:nutri_kids_movil/ui/layouts/splash/splash_layout.dart';
 import 'package:provider/provider.dart';
 
@@ -64,8 +65,8 @@ class MainApp extends StatelessWidget {
         if (authProvider.authStatus == AuthStatus.checking) {
           return const SplashLayout();
         } else if (authProvider.authStatus == AuthStatus.authenticated) {
-          // return const AdminDashboardPage();
-          return child ?? const SizedBox.shrink();
+          return  DashboardLayout(child: child!);
+          
         } else {
           // return const AdminLoginPage();
           return AuthLayout(child: child!);

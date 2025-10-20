@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nutri_kids_movil/helpers/ui_helper.dart';
+import 'package:nutri_kids_movil/providers/auth_provider.dart';
 import 'package:nutri_kids_movil/providers/loading_provider.dart';
 import 'package:nutri_kids_movil/router/router.dart';
 import 'package:nutri_kids_movil/services/apis/auth_service.dart';
@@ -75,9 +76,11 @@ class _LoginViewState extends State<LoginView> {
                 if (_formKey.currentState?.validate() ?? false) {
                   loadingProvider.show();
                   final success = await AuthService().login(_emailController.text, _passwordController.text);
+                  print(  "Login success: $success");
                   loadingProvider.hide();
                   if (success) {
                     UiHelper.showSuccess(context, 'Inicio de sesión exitoso');
+                    NavigationService.replaceTo(Flurorouter.dashboardRoute);
                   } else {
                     UiHelper.showError(context, 'Error en el inicio de sesión. Verifica tus credenciales.');
                   }
@@ -86,6 +89,7 @@ class _LoginViewState extends State<LoginView> {
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 backgroundColor: const Color(0xFF1d7151), // verde de tu logo
+                foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -97,7 +101,21 @@ class _LoginViewState extends State<LoginView> {
             ),
           ),
           const SizedBox(height: 16),
-      
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text("¿No tienes una cuenta?"),
+              TextButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, Flurorouter.registerRoute);
+                },
+                child: const Text(
+                  "Regístrate",
+                  style: TextStyle(color: Color(0xFF1d7151), fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
           // Botón de olvidé mi contraseña
           TextButton(
             onPressed: () {

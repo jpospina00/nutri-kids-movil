@@ -5,8 +5,8 @@ class DioClient {
   static final Dio _dio = Dio(
     BaseOptions(
       baseUrl: 'http://192.168.18.41:3000/api', // Cambia esto por tu URL base
-      connectTimeout: Duration(milliseconds: 5000),
-      receiveTimeout: Duration(milliseconds: 3000),
+      connectTimeout: Duration(seconds: 20),
+      receiveTimeout: Duration(seconds: 40),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
