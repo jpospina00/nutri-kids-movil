@@ -31,25 +31,33 @@ class _DashboardLayoutState extends State<DashboardLayout> {
   }
 
   void getUsersByUser() async {
-  DashboardService dashboardService = DashboardService();
-  List<User?> users = await dashboardService.getUsersByUser();
+  try {
+    HiveServices hiveServices = HiveServices();
+    final data = hiveServices.getData('users'); // sin cast directo        
 
-  HiveServices hiveServices = HiveServices();
+    if (data == null || (data as List).isEmpty) {
+      return;
+    }
 
-  // Convertimos la lista de usuarios a lista de mapas JSON
-  List<Map<String, dynamic>> usersList =
-      users.map((u) => u!.toJson()).toList();
+    // 🔹 Convertir de List<dynamic> → List<Map<String, dynamic>>
+    final List<Map<String, dynamic>> usersList = (data as List)
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .toList();
 
-  // Guardamos directamente la lista
-  await hiveServices.saveData('users', usersList);
+    final List<String> userNames =
+        usersList.map((u) => u['name'] as String).toList();
 
-  // Extraemos nombres
-  List<String> userNames = users.map((u) => u!.name).toList();
+    setState(() {
+      options
+        ..clear()
+        ..addAll(userNames);
+    });
 
-  setState(() {
-    options.addAll(userNames);
-  });
+  } catch (e) {
+    print('❌ Error al cargar usuarios desde Hive: $e');
+  }
 }
+
 
   @override
   Widget build(BuildContext context) {

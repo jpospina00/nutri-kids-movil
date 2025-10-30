@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:nutri_kids_movil/providers/dropdown_provider.dart';
+import 'package:nutri_kids_movil/services/apis/dashboard_service.dart';
+import 'package:nutri_kids_movil/services/hive_services.dart';
+import 'package:provider/provider.dart';
 
 class MealDetailView extends StatefulWidget {
   final String tipo;
@@ -104,7 +108,10 @@ class _MealDetailViewState extends State<MealDetailView> {
                 children: [
                   _nutrientCard('🔥 Calorías', '${nutricion['calorias']} kcal'),
                   _nutrientCard('💪 Proteínas', '${nutricion['proteinas']} g'),
-                  _nutrientCard('🍞 Carbohidratos', '${nutricion['carbohidratos']} g'),
+                  _nutrientCard(
+                    '🍞 Carbohidratos',
+                    '${nutricion['carbohidratos']} g',
+                  ),
                   _nutrientCard('🥑 Grasas', '${nutricion['grasas']} g'),
                 ],
               ),
@@ -129,62 +136,62 @@ class _MealDetailViewState extends State<MealDetailView> {
             ),
             const SizedBox(height: 10),
 
-            ...List.generate(
-              (data['ingredientes'] as List).length,
-              (i) {
-                final ing = data['ingredientes'][i];
-                final isSelected = _selectedIngredients.contains(ing);
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      if (isSelected) {
-                        _selectedIngredients.remove(ing);
-                      } else {
-                        _selectedIngredients.add(ing);
-                      }
-                    });
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 250),
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 6),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 15, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? Colors.green.withOpacity(0.15)
-                          : Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color:
-                            isSelected ? Colors.green : Colors.grey.shade300,
-                        width: 1.3,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          isSelected
-                              ? Icons.check_circle
-                              : Icons.radio_button_unchecked,
-                          color: isSelected ? Colors.green : Colors.grey,
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            ing,
-                            style: GoogleFonts.poppins(
-                              fontSize: 15,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        ),
-                      ],
+            ...List.generate((data['ingredientes'] as List).length, (i) {
+              final ing = data['ingredientes'][i];
+              final isSelected = _selectedIngredients.contains(ing);
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    if (isSelected) {
+                      _selectedIngredients.remove(ing);
+                    } else {
+                      _selectedIngredients.add(ing);
+                    }
+                  });
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 6,
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 15,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? Colors.green.withOpacity(0.15)
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isSelected ? Colors.green : Colors.grey.shade300,
+                      width: 1.3,
                     ),
                   ),
-                );
-              },
-            ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        isSelected
+                            ? Icons.check_circle
+                            : Icons.radio_button_unchecked,
+                        color: isSelected ? Colors.green : Colors.grey,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          ing,
+                          style: GoogleFonts.poppins(
+                            fontSize: 15,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
 
             const SizedBox(height: 30),
 
@@ -198,7 +205,9 @@ class _MealDetailViewState extends State<MealDetailView> {
                     icon: Icons.thumb_up_alt_rounded,
                     label: "Me gusta",
                     color: Colors.green,
-                    onPressed: () {
+                    onPressed: () async {
+                      try{
+                      await onClick(true);
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('¡Añadido a tus comidas favoritas! 💚'),
@@ -206,20 +215,42 @@ class _MealDetailViewState extends State<MealDetailView> {
                           behavior: SnackBarBehavior.floating,
                         ),
                       );
+                      } catch(e){
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Error al procesar la solicitud: $e'),
+                            backgroundColor: Colors.redAccent,
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                    }
                     },
                   ),
                   _likeButton(
                     icon: Icons.thumb_down_alt_rounded,
                     label: "No me gusta",
                     color: Colors.redAccent,
-                    onPressed: () {
+                    onPressed: () async{
+                      try{
+                      await onClick(false);
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Entendido, no te la mostraremos más 🍅'),
+                          content: Text(
+                            'Entendido, no te la mostraremos más 🍅',
+                          ),
                           backgroundColor: Colors.redAccent,
                           behavior: SnackBarBehavior.floating,
                         ),
                       );
+                      } catch(e){
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Error al procesar la solicitud: $e'),
+                            backgroundColor: Colors.redAccent,
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      }
                     },
                   ),
                 ],
@@ -250,17 +281,18 @@ class _MealDetailViewState extends State<MealDetailView> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(value,
-              style: GoogleFonts.poppins(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: Colors.green[700],
-              )),
-          Text(label,
-              style: GoogleFonts.poppins(
-                fontSize: 13,
-                color: Colors.black54,
-              )),
+          Text(
+            value,
+            style: GoogleFonts.poppins(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: Colors.green[700],
+            ),
+          ),
+          Text(
+            label,
+            style: GoogleFonts.poppins(fontSize: 13, color: Colors.black54),
+          ),
         ],
       ),
     );
@@ -288,5 +320,41 @@ class _MealDetailViewState extends State<MealDetailView> {
         ),
       ),
     );
+  }
+
+  Future<bool> onClick(bool value) async {
+    try{
+
+    HiveServices hiveServices = HiveServices();
+    final data = hiveServices.getData('users'); // sin cast directo
+    print('Datos obtenidos de Hive: $data');
+
+    if (data == null || (data as List).isEmpty) {
+      print('⚠️ No hay usuarios guardados en Hive');
+      return false;
+    }
+
+    // 🔹 Convertir de List<dynamic> → List<Map<String, dynamic>>
+    final List<Map<String, dynamic>> users = (data as List)
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .toList();
+
+    final dropdownProvider = Provider.of<DropdownProvider>(
+      context,
+      listen: false,
+    );
+    Map<String, dynamic> userSelected = users.firstWhere(
+      (element) => element['name'] == dropdownProvider.selectedValue,
+    );
+    DashboardService dashboardService = DashboardService();
+    await dashboardService.likeOrDislikeMeal(
+      userSelected['id'],
+      _selectedIngredients.toList(),
+      value,
+    );
+    return true;
+    } catch(e){
+      throw Exception('Error al procesar la solicitud: $e');
+    }
   }
 }

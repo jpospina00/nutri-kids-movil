@@ -21,22 +21,40 @@ class _SidebarState extends State<Sidebar> {
   final List<String> options = [];
   User? user;
 
-  void initState(){
+  @override
+  void initState() {
     super.initState();
     _loadSelectedIndex();
+    getUserData();
   }
-
-  void getUserData() async {
+void getUserData() {
+  try {
     HiveServices hiveServices = HiveServices();
-    Map<String, dynamic> userData = await hiveServices.getData('user');
+    final userData = hiveServices.getData('user');
+
+    if (userData == null) {
+      print('⚠️ No hay datos de usuario guardados en Hive');
+      return;
+    }
+
     print('User Data in Sidebar: $userData');
+
+    // 🔹 Convertir a Map<String, dynamic> de forma segura
+    final Map<String, dynamic> parsedUser =
+        Map<String, dynamic>.from(userData as Map);
+
     setState(() {
-      user = User.fromJson(userData);
+      user = User.fromJson(parsedUser);
     });
+  } catch (e) {
+    print('Error al obtener datos del usuario: $e');
   }
+}
+
 
   void _loadSelectedIndex() async{
     // Load the selected index from shared preferences or any other source
+    print('Aqui');
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _selectedIndex = prefs.getInt('selectedIndex') ?? 0;
@@ -67,9 +85,9 @@ class _SidebarState extends State<Sidebar> {
       'index': 1,
     },
     {
-      'text': 'Settings',
-      'icon': Icons.settings,
-      'route': '/dashboard/settings',
+      'text': 'Agregar usuario',
+      'icon': Icons.add_circle_outline,
+      'route': '/dashboard/add_user',
       'index': 2,
     },
   ];

@@ -69,7 +69,7 @@ class _LoginViewState extends State<LoginView> {
           const SizedBox(height: 24),
       
           // Botón login
-          SizedBox(
+          SizedBox( 
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () async {

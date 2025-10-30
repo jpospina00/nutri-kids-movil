@@ -13,7 +13,7 @@ class HiveServices {
     await _box.put(key, value);
   }
 
-   dynamic getData(String key) async {
+   dynamic getData(String key) {
     return _box.get(key);
   }
 

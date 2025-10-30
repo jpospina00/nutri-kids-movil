@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:nutri_kids_movil/models/user_model.dart';
 import 'package:nutri_kids_movil/providers/auth_provider.dart';
+import 'package:nutri_kids_movil/services/apis/dashboard_service.dart';
 import 'package:nutri_kids_movil/services/apis/dio_client.dart';
 import 'package:nutri_kids_movil/services/hive_services.dart';
 import 'package:nutri_kids_movil/services/local_storage.dart';
@@ -60,14 +62,20 @@ class AuthService {
         "/auth/login",
         data: {"email": email, "password": password},
       );
-      if(response.data["token"] != null) {
+      if (response.data["token"] != null) {
         HiveServices hiveServices = HiveServices();
-        Map<String, dynamic> userMap = response.data["user"] as Map<String, dynamic>;
-        
+        Map<String, dynamic> userMap =
+            response.data["user"] as Map<String, dynamic>;
+
         await hiveServices.saveData('user', userMap);
-        LocalStorage.prefs.setString('selectedUser', response.data["user"]["name"]);
+        LocalStorage.prefs.setString(
+          'selectedUser',
+          response.data["user"]["name"],
+        );
+
         BuildContext cdx = NavigationService.navigatorKey.currentContext!;
-        cdx.read<AuthProvider>().login(response.data["token"]);
+        await cdx.read<AuthProvider>().login(response.data["token"]);
+        
       }
       return response.data["ok"] ?? false;
     } on DioException catch (e) {
@@ -76,11 +84,23 @@ class AuthService {
     }
   }
 
-  Future<bool> register( String email, String password, String name, String lastName, int age) async {
+  Future<bool> register(
+    String email,
+    String password,
+    String name,
+    String lastName,
+    int age,
+  ) async {
     try {
       final response = await _dio.post(
         "/auth/register",
-        data: {"email": email, "password": password, "name": name, "lastName": lastName, "age": age},
+        data: {
+          "email": email,
+          "password": password,
+          "name": name,
+          "lastName": lastName,
+          "age": age,
+        },
       );
       print("Respuesta: ${response.data}");
       return response.data["ok"] ?? false;

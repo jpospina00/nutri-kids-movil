@@ -22,6 +22,45 @@ class DashboardView extends StatefulWidget {
 class _DashboardViewState extends State<DashboardView> {
   Map<String, dynamic>? _meals; // Guardará el plan recibido del backend
 
+  @override
+  void initState() {
+    super.initState();
+    _getMeals(context);
+  }
+
+  Future<void> _getMeals(BuildContext context) async {
+    try {
+    HiveServices hiveServices = HiveServices();
+    final data = hiveServices.getData('users'); // sin cast directo
+    print('Datos obtenidos de Hive: $data');
+
+    if (data == null || (data as List).isEmpty) {
+      print('⚠️ No hay usuarios guardados en Hive');
+      return;
+    }
+
+    // 🔹 Convertir de List<dynamic> → List<Map<String, dynamic>>
+    final List<Map<String, dynamic>> users = (data as List)
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .toList();
+
+    final dropdownProvider =
+        Provider.of<DropdownProvider>(context, listen: false);
+    Map<String, dynamic> userSelected =
+        users.firstWhere((element) => element['name'] == dropdownProvider.selectedValue);
+    print('Usuario seleccionado en DashboardView: $userSelected');
+
+    DashboardService dashboardService = DashboardService();
+    Map<String, dynamic> meals = await dashboardService.getMeals(userSelected['id']);
+    print('Comidas obtenidas: $meals');
+    setState(() {
+      _meals = meals['plan'] as Map<String, dynamic>?;
+    });
+    } catch (e) {
+      print('Error al obtener comidas: $e');
+    }
+  }
+
   Future<void> _generateMeals(BuildContext context) async {
     final loadingProvider = Provider.of<LoadingProvider>(context, listen: false);
 
@@ -38,75 +77,25 @@ class _DashboardViewState extends State<DashboardView> {
       await Future.delayed(const Duration(seconds: 4));
       
       HiveServices hiveServices = HiveServices();
-       List<Map<String, dynamic>> users = await hiveServices.getData('users');
+       final data = hiveServices.getData('users'); // sin cast directo
+    print('Datos obtenidos de Hive: $data');
+
+    if (data == null || (data as List).isEmpty) {
+      print('⚠️ No hay usuarios guardados en Hive');
+      return;
+    }
+
+    // 🔹 Convertir de List<dynamic> → List<Map<String, dynamic>>
+    final List<Map<String, dynamic>> users = (data as List)
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .toList();
+
        final dropdownProvider =
               Provider.of<DropdownProvider>(context, listen: false);
        Map<String, dynamic> userSelected = users.firstWhere((element) => element['name'] == dropdownProvider.selectedValue);
        print(userSelected);
       DashboardService dashboardService = DashboardService();
       Map<String, dynamic> meals = await dashboardService.generateMeals(userSelected['id']);
-
-
-      // Simulación de respuesta del backend
-      // const responseJson = {
-      //   "ok": true,
-      //   "plan": {
-      //     "desayuno": {
-      //       "plato": "Tostada de plátano con mermelada de fresa",
-      //       "descripcion":
-      //           "Una tostada integral rellena con mermelada de fresa y una rodaja de plátano.",
-      //       "ingredientes": [
-      //         "1 tosta integral",
-      //         "1 plátano",
-      //         "1 cucharadita de mermelada de fresa"
-      //       ],
-      //       "nutricion": {
-      //         "calorias": 250,
-      //         "carbohidratos": 40,
-      //         "proteinas": 2,
-      //         "grasas": 5
-      //       },
-      //       "imagen":
-      //           "https://pixabay.com/get/g8ea958957b4a292e20832642ded3feb66de40ccfb37bbdbccda9134e41f2279efc2138f337ff01db1f54858660586de1b14d9a5fedf25f911e73711c4671acb6_640.jpg"
-      //     },
-      //     "almuerzo": {
-      //       "plato": "Pescado frito con arroz y ensalada de aguacate",
-      //       "descripcion":
-      //           "Pescado frito acompañado de arroz blanco y una ensalada fresca de aguacate.",
-      //       "ingredientes": [
-      //         "150g pescado frito (pargo o tilapia)",
-      //         "1 taza de arroz blanco",
-      //         "1 taza de ensalada (aguacate, tomate)"
-      //       ],
-      //       "nutricion": {
-      //         "calorias": 550,
-      //         "carbohidratos": 60,
-      //         "proteinas": 35,
-      //         "grasas": 15
-      //       },
-      //       "imagen":
-      //           "https://pixabay.com/get/g8c16bd0d37086969a201b580c9bcdd7aa11a866ade58a1494c8e401ebd858b526b91a22a5881f853e5d6ce1cae85c77b93246de6b5984e51fbc1952f6b7ac124_640.jpg"
-      //     },
-      //     "cena": {
-      //       "plato": "Sopa de frutas con quinoa",
-      //       "descripcion": "Una sopa ligera de frutas acompañada de quinoa.",
-      //       "ingredientes": [
-      //         "1 taza de sopa de frutas (banana, mango)",
-      //         "1/2 taza de quinoa",
-      //         "1 cucharadita de aceite"
-      //       ],
-      //       "nutricion": {
-      //         "calorias": 450,
-      //         "carbohidratos": 60,
-      //         "proteinas": 10,
-      //         "grasas": 10
-      //       },
-      //       "imagen":
-      //           "https://pixabay.com/get/g3ac924ccd894e8b25bf405e944362efd30d50841ade566348a7bfff5129926f35f45819a793ab699454a7c324a659c6b5205e84f4d5695f5269c411dea318ca4_640.jpg"
-      //     }
-      //   }
-      // };
-
       if (!mounted) return;
 
       setState(() {

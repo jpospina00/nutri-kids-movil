@@ -62,13 +62,14 @@ class MainApp extends StatelessWidget {
       ),
       builder: (context, child) {
         final authProvider = Provider.of<AuthProvider>(context);
+        print('Auth Status: ${authProvider.authStatus}');
         if (authProvider.authStatus == AuthStatus.checking) {
           return const SplashLayout();
         } else if (authProvider.authStatus == AuthStatus.authenticated) {
           return  DashboardLayout(child: child!);
           
         } else {
-          // return const AdminLoginPage();
+          
           return AuthLayout(child: child!);
         }
       },
