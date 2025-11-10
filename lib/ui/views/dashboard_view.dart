@@ -73,8 +73,6 @@ class _DashboardViewState extends State<DashboardView> {
     );
 
     try {
-      // 🔹 Aquí deberías usar tu servicio real, esto es un ejemplo con delay
-      await Future.delayed(const Duration(seconds: 4));
       
       HiveServices hiveServices = HiveServices();
        final data = hiveServices.getData('users'); // sin cast directo

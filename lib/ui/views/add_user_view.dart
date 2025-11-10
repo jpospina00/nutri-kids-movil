@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:nutri_kids_movil/providers/loading_provider.dart';
 import 'package:nutri_kids_movil/router/router.dart';
 import 'package:nutri_kids_movil/services/apis/dashboard_service.dart';
 import 'package:nutri_kids_movil/services/navigation_services.dart';
+import 'package:provider/provider.dart';
 
 class AddUserView extends StatefulWidget {
   const AddUserView({super.key});
@@ -29,6 +31,16 @@ class _AddUserViewState extends State<AddUserView> {
 
   void _saveForm() async{
     if (_formKey.currentState!.validate()) {
+      final loadingProvider = Provider.of<LoadingProvider>(context, listen: false);
+
+    loadingProvider.show(
+      messages: [
+        'Preparando su comida...',
+        'Agregando ingredientes...',
+        'Emplatando con amor...',
+      ],
+    );
+
       final userData = {
         'name': _nameController.text.trim(),
         'lastName': _lastNameController.text.trim(),
@@ -76,6 +88,7 @@ class _AddUserViewState extends State<AddUserView> {
             behavior: SnackBarBehavior.floating,
           ),
         );
+        loadingProvider.hide();
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
@@ -96,8 +109,10 @@ class _AddUserViewState extends State<AddUserView> {
             behavior: SnackBarBehavior.floating,
           ),
         );
+        loadingProvider.hide();
         return;
       }
+      loadingProvider.hide();
       NavigationService.navigateTo(
     Flurorouter.recommendationsViewRoute,
     arguments: {

@@ -75,7 +75,7 @@ void getUserData() {
     {
       'text': 'Home',
       'icon': Icons.home,
-      'route': '/dashboard/home',
+      'route': '/dashboard',
       'index': 0,
     },
     {

@@ -28,26 +28,30 @@ class _LoginViewState extends State<LoginView> {
       child: Column(
         children: [
           // Campo de email
-          TextFormField(
-            controller: _emailController,
-            decoration: const InputDecoration(
-              labelText: "Correo electrónico",
-              prefixIcon: Icon(Icons.email_outlined),
+          Semantics(
+            label: 'Campo de correo electrónico',
+            hint: 'Ingresa tu correo electrónico',
+            child: TextFormField(
+              controller: _emailController,
+              decoration: const InputDecoration(
+                labelText: "Correo electrónico",
+                prefixIcon: Icon(Icons.email_outlined),
+              ),
+              keyboardType: TextInputType.emailAddress,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor ingresa tu correo electrónico';
+                }
+                final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                if (!emailRegex.hasMatch(value)) {
+                  return 'Por favor ingresa un correo electrónico válido';
+                }
+                return null;
+              },
             ),
-            keyboardType: TextInputType.emailAddress,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor ingresa tu correo electrónico';
-              }
-              final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-              if (!emailRegex.hasMatch(value)) {
-                return 'Por favor ingresa un correo electrónico válido';
-              }
-              return null;
-            },
           ),
           const SizedBox(height: 16),
-      
+
           // Campo de contraseña
           TextFormField(
             controller: _passwordController,
@@ -67,36 +71,46 @@ class _LoginViewState extends State<LoginView> {
             },
           ),
           const SizedBox(height: 24),
-      
+
           // Botón login
-          SizedBox( 
+          SizedBox(
             width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () async {
-                if (_formKey.currentState?.validate() ?? false) {
-                  loadingProvider.show();
-                  final success = await AuthService().login(_emailController.text, _passwordController.text);
-                  print(  "Login success: $success");
-                  loadingProvider.hide();
-                  if (success) {
-                    UiHelper.showSuccess(context, 'Inicio de sesión exitoso');
-                    NavigationService.replaceTo(Flurorouter.dashboardRoute);
-                  } else {
-                    UiHelper.showError(context, 'Error en el inicio de sesión. Verifica tus credenciales.');
+            child: Semantics(
+              button: true,
+              label: 'Botón para iniciar sesión',
+              child: ElevatedButton(
+                onPressed: () async {
+                  if (_formKey.currentState?.validate() ?? false) {
+                    loadingProvider.show();
+                    final success = await AuthService().login(
+                      _emailController.text,
+                      _passwordController.text,
+                    );
+                    print("Login success: $success");
+                    loadingProvider.hide();
+                    if (success) {
+                      UiHelper.showSuccess(context, 'Inicio de sesión exitoso');
+                      NavigationService.replaceTo(Flurorouter.dashboardRoute);
+                    } else {
+                      UiHelper.showError(
+                        context,
+                        'Error en el inicio de sesión. Verifica tus credenciales.',
+                      );
+                    }
                   }
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                backgroundColor: const Color(0xFF1d7151), // verde de tu logo
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  backgroundColor: const Color(0xFF1d7151), // verde de tu logo
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-              ),
-              child: const Text(
-                "Iniciar sesión",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                child: const Text(
+                  "Iniciar sesión",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ),
@@ -111,7 +125,10 @@ class _LoginViewState extends State<LoginView> {
                 },
                 child: const Text(
                   "Regístrate",
-                  style: TextStyle(color: Color(0xFF1d7151), fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: Color(0xFF1d7151),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
@@ -122,7 +139,7 @@ class _LoginViewState extends State<LoginView> {
               Navigator.pushNamed(context, Flurorouter.forgotPasswordRoute);
             },
             child: const Text(
-              "¿Olvidaste tu contraseña?",  
+              "¿Olvidaste tu contraseña?",
               style: TextStyle(color: Color(0xFF1d7151)),
             ),
           ),

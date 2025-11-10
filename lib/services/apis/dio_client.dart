@@ -4,7 +4,7 @@ import 'package:nutri_kids_movil/services/local_storage.dart';
 class DioClient {
   static final Dio _dio = Dio(
     BaseOptions(
-      baseUrl: 'http://192.168.18.41:3000/api', // Cambia esto por tu URL base
+      baseUrl: 'http://192.168.92.1:3000/api', // Cambia esto por tu URL base
       connectTimeout: Duration(seconds: 20),
       receiveTimeout: Duration(seconds: 40),
       headers: {

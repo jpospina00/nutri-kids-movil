@@ -1,5 +1,6 @@
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:nutri_kids_movil/providers/auth_provider.dart';
 import 'package:nutri_kids_movil/providers/loading_provider.dart';
 import 'package:nutri_kids_movil/router/router.dart';
@@ -13,6 +14,7 @@ import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SemanticsBinding.instance.ensureSemantics();
   await LocalStorage.configurePrefs();
   await HiveServices.initHive();
   Flurorouter.configureRoutes();

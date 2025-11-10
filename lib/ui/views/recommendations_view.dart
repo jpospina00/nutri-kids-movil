@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:nutri_kids_movil/providers/loading_provider.dart';
 import 'package:nutri_kids_movil/router/router.dart';
 import 'package:nutri_kids_movil/services/apis/dashboard_service.dart';
 import 'package:nutri_kids_movil/services/navigation_services.dart';
+import 'package:provider/provider.dart';
 
 class RecommendationsView extends StatefulWidget {
   final String userId;
@@ -25,6 +27,34 @@ class _RecommendationsViewState extends State<RecommendationsView> {
   @override
   Widget build(BuildContext context) {
     print('Recomendaciones recibidas: ${widget.recommendations}');
+
+  // ✅ Normalizar recomendaciones si vienen anidadas
+  List<Map<String, dynamic>> normalizedRecommendations = [];
+
+if (widget.recommendations.isNotEmpty) {
+  final first = widget.recommendations.first;
+  if (first is Map && first.keys.any((k) => k.toString().contains('opcion_'))) {
+    // Extraer las opciones internas
+    first.forEach((key, value) {
+      if (value is Map<String, dynamic>) {
+        normalizedRecommendations.add(value);
+      }
+    });
+  } else if (first is Map<String, dynamic>) {
+    // Ya está en el formato correcto
+    normalizedRecommendations =
+        List<Map<String, dynamic>>.from(widget.recommendations);
+  }
+}
+
+  // ⚙️ Si no hay datos válidos, mostrar un mensaje
+  if (normalizedRecommendations.isEmpty) {
+    return const Scaffold(
+      body: Center(
+        child: Text('No hay recomendaciones disponibles'),
+      ),
+    );
+  }
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -45,9 +75,9 @@ class _RecommendationsViewState extends State<RecommendationsView> {
                 _buildCustomOption(), // 🔹 Ahora primero
                 const SizedBox(height: 10),
                 ...List.generate(
-                  widget.recommendations.length,
+                  normalizedRecommendations.length,
                   (index) {
-                    final rec = widget.recommendations[index];
+                    final rec = normalizedRecommendations[index];
                     final isSelected = _selectedPlan == rec && !_customSelected;
 
                     return _RecommendationCard(
@@ -174,6 +204,15 @@ class _RecommendationsViewState extends State<RecommendationsView> {
 
   void _continue(BuildContext context) {
     Map<String, dynamic> selectedData;
+    final loadingProvider = Provider.of<LoadingProvider>(context, listen: false);
+
+    loadingProvider.show(
+      messages: [
+        'Preparando su comida...',
+        'Agregando ingredientes...',
+        'Emplatando con amor...',
+      ],
+    );
 
     if (_customSelected) {
       final calories = int.tryParse(_customCaloriesController.text.trim());
@@ -184,6 +223,7 @@ class _RecommendationsViewState extends State<RecommendationsView> {
             backgroundColor: Colors.red,
           ),
         );
+        loadingProvider.hide();
         return;
       }
       selectedData = {'custom': true, 'calorias_diarias': calories};
@@ -202,6 +242,7 @@ class _RecommendationsViewState extends State<RecommendationsView> {
           backgroundColor: Colors.red,
         ),
       );
+      loadingProvider.hide();
       return;
 
     }
@@ -216,6 +257,7 @@ class _RecommendationsViewState extends State<RecommendationsView> {
         behavior: SnackBarBehavior.floating,
       ),
     );
+    loadingProvider.hide();
       print('calorias seleccionadas: ${selectedData['calorias_diarias']}');
     // Future.delayed(const Duration(milliseconds: 700), () {
     //   NavigationService.navigateTo(
