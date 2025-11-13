@@ -212,4 +212,32 @@ class DashboardService {
       return false;
     }
   }
+
+  Future<Map<String, dynamic>> getFoodHistory(String userId) async {
+    try {
+      String token = LocalStorage.prefs.getString('token') ?? '';
+
+      final response = await _dio.get(
+        "/food/history/$userId",
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      print("Respuesta: ${response.data}");
+
+      if (response.statusCode == 200) {
+        return response.data;
+      } else {
+        print("Error: código de estado ${response.statusCode}");
+        return {};
+      }
+    } on DioException catch (e) {
+      print(
+        "Error al obtener historial de comidas: ${e.response?.data ?? e.message}",
+      );
+      return {};
+    } catch (e) {
+      print("Error inesperado: $e");
+      return {};
+    }
+  }
 }

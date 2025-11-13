@@ -90,6 +90,12 @@ void getUserData() {
       'route': '/dashboard/add_user',
       'index': 2,
     },
+    {
+      'text': 'Historial de comidas',
+      'icon': Icons.history,
+      'route': '/dashboard/food_history',
+      'index': 3,
+    },
   ];
 
   @override

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:nutri_kids_movil/providers/auth_provider.dart';
 import 'package:nutri_kids_movil/ui/views/add_user_view.dart';
 import 'package:nutri_kids_movil/ui/views/dashboard_view.dart';
+import 'package:nutri_kids_movil/ui/views/food_history_view.dart';
+import 'package:nutri_kids_movil/ui/views/history_meal_detail_view.dart';
 import 'package:nutri_kids_movil/ui/views/login_view.dart';
 import 'package:nutri_kids_movil/ui/views/meal_detail_view.dart';
 import 'package:nutri_kids_movil/ui/views/recommendations_view.dart';
@@ -59,4 +61,37 @@ class DashboardHandlers {
       );
     },
   );
+
+  static Handler foodHistoryView = Handler(
+    handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
+      final authProvider = Provider.of<AuthProvider>(context!, listen: false);
+      if(authProvider.authStatus == AuthStatus.notAuthenticated){
+        return LoginView();
+      }
+      // Aquí iría la lógica para retornar la vista de historial de comidas
+      return const FoodHistoryView();
+    },
+  );
+
+  static Handler foodHistoryDetailView = Handler(
+  handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
+    final authProvider = Provider.of<AuthProvider>(context!, listen: false);
+    if (authProvider.authStatus == AuthStatus.notAuthenticated) {
+      return LoginView();
+    }
+
+    final args = context.settings?.arguments as Map<String, dynamic>? ?? {};
+    final date = args['date'] ?? '';
+    final plan = args['plan'] ?? {};
+
+    return HistoryMealDetailView(
+      tipo: 'Plan diario',
+      data: {
+        'fecha': date,
+        'plan': plan,
+      },
+    );
+  },
+);
+
 }

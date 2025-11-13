@@ -20,7 +20,8 @@ class DashboardView extends StatefulWidget {
 }
 
 class _DashboardViewState extends State<DashboardView> {
-  Map<String, dynamic>? _meals; // Guardará el plan recibido del backend
+  Map<String, dynamic>? _meals;
+  String? _lastSelectedValue; // Para detectar cambios en el dropdown
 
   @override
   void initState() {
@@ -28,34 +29,50 @@ class _DashboardViewState extends State<DashboardView> {
     _getMeals(context);
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final dropdownProvider = Provider.of<DropdownProvider>(context);
+    // Solo recargamos si cambió el valor
+    if (_lastSelectedValue != dropdownProvider.selectedValue) {
+      _lastSelectedValue = dropdownProvider.selectedValue;
+      _getMeals(context);
+    }
+  }
+
   Future<void> _getMeals(BuildContext context) async {
     try {
-    HiveServices hiveServices = HiveServices();
-    final data = hiveServices.getData('users'); // sin cast directo
-    print('Datos obtenidos de Hive: $data');
+      HiveServices hiveServices = HiveServices();
+      final data = hiveServices.getData('users');
+      print('Datos obtenidos de Hive: $data');
 
-    if (data == null || (data as List).isEmpty) {
-      print('⚠️ No hay usuarios guardados en Hive');
-      return;
-    }
+      if (data == null || (data as List).isEmpty) {
+        print('⚠️ No hay usuarios guardados en Hive');
+        return;
+      }
 
-    // 🔹 Convertir de List<dynamic> → List<Map<String, dynamic>>
-    final List<Map<String, dynamic>> users = (data as List)
-        .map((e) => Map<String, dynamic>.from(e as Map))
-        .toList();
+      final List<Map<String, dynamic>> users = (data as List)
+          .map((e) => Map<String, dynamic>.from(e as Map))
+          .toList();
 
-    final dropdownProvider =
-        Provider.of<DropdownProvider>(context, listen: false);
-    Map<String, dynamic> userSelected =
-        users.firstWhere((element) => element['name'] == dropdownProvider.selectedValue);
-    print('Usuario seleccionado en DashboardView: $userSelected');
+      final dropdownProvider =
+          Provider.of<DropdownProvider>(context, listen: false);
+      Map<String, dynamic> userSelected = users.firstWhere(
+        (element) => element['name'] == dropdownProvider.selectedValue,
+      );
 
-    DashboardService dashboardService = DashboardService();
-    Map<String, dynamic> meals = await dashboardService.getMeals(userSelected['id']);
-    print('Comidas obtenidas: $meals');
-    setState(() {
-      _meals = meals['plan'] as Map<String, dynamic>?;
-    });
+      print('Usuario seleccionado en DashboardView: $userSelected');
+
+      DashboardService dashboardService = DashboardService();
+      Map<String, dynamic> meals =
+          await dashboardService.getMeals(userSelected['id']);
+      print('Comidas obtenidas: $meals');
+
+      if (!mounted) return;
+      setState(() {
+        _meals = meals['plan'] as Map<String, dynamic>?;
+      });
     } catch (e) {
       print('Error al obtener comidas: $e');
     }
@@ -124,7 +141,8 @@ class _DashboardViewState extends State<DashboardView> {
   @override
   Widget build(BuildContext context) {
     final screen = MediaQuery.of(context).size;
-
+    final dropdownProvider =
+        Provider.of<DropdownProvider>(context, listen: true);
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: SingleChildScrollView(

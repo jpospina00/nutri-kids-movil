@@ -256,8 +256,9 @@ class _DropOptionsState extends State<DropOptions> {
                         });
                       },
                       onTap: () {
-                        dropdownProvider.setShowMenu(false);
+                        print('Seleccionaste: $option');
                         dropdownProvider.setSelectedValue(option);
+                        dropdownProvider.setShowMenu(false);
                         Navigator.of(context).pop();
                       },
                       child: optionTile,
