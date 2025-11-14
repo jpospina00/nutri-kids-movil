@@ -18,6 +18,7 @@ class Flurorouter {
   static String recommendationsViewRoute = '/dashboard/recommendations';
   static String foodHistoryViewRoute = '/dashboard/food_history';
   static String foodHistoryDetailViewRoute = '/dashboard/food_history_detail';
+  static String updateUserViewRoute = '/dashboard/update_user';
 
   static void configureRoutes() {
     router.define(rootRoute, handler: AdminHandlers.login, transitionType: TransitionType.inFromRight);
@@ -33,5 +34,6 @@ class Flurorouter {
     router.define(recommendationsViewRoute, handler: DashboardHandlers.recommendationsView, transitionType: TransitionType.inFromRight);
     router.define(foodHistoryViewRoute, handler: DashboardHandlers.foodHistoryView, transitionType: TransitionType.inFromRight);
     router.define(foodHistoryDetailViewRoute, handler: DashboardHandlers.foodHistoryDetailView, transitionType: TransitionType.inFromRight);
+    router.define(updateUserViewRoute, handler: DashboardHandlers.updateUserView, transitionType: TransitionType.inFromRight);
   }
 }

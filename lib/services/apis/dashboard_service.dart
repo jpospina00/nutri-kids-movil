@@ -240,4 +240,48 @@ class DashboardService {
       return {};
     }
   }
+
+  Future<bool> updateUser(
+  String idUser,
+  int age,
+  double weight,
+  double height,
+  String activityLevel,
+  String goal,
+  List<String> allergies,
+  List<String> likes,
+  List<String> dislikes,
+) async {
+  try {
+    String token = LocalStorage.prefs.getString('token') ?? '';
+
+    print("🔄 Enviando actualización de usuario $idUser");
+
+    final response = await _dio.put(
+      "/user/update/$idUser",
+      data: {
+        'age': age,
+        'weight': weight,
+        'height': height,
+        'activityLevel': activityLevel,
+        'goal': goal,
+        'allergies': allergies,
+        'likes': likes,
+        'dislikes': dislikes,
+      },
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+
+    print("Respuesta updateUser: ${response.data}");
+
+    return response.statusCode == 200;
+  } on DioException catch (e) {
+    print("❌ Error al actualizar usuario: ${e.response?.data ?? e.message}");
+    return false;
+  } catch (e) {
+    print("❌ Error inesperado al actualizar usuario: $e");
+    return false;
+  }
+}
+
 }

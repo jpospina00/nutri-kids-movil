@@ -81,7 +81,7 @@ void getUserData() {
     {
       'text': 'Profile',
       'icon': Icons.person,
-      'route': '/dashboard/profile',
+      'route': '/dashboard/update_user',
       'index': 1,
     },
     {

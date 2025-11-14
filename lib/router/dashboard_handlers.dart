@@ -8,6 +8,7 @@ import 'package:nutri_kids_movil/ui/views/history_meal_detail_view.dart';
 import 'package:nutri_kids_movil/ui/views/login_view.dart';
 import 'package:nutri_kids_movil/ui/views/meal_detail_view.dart';
 import 'package:nutri_kids_movil/ui/views/recommendations_view.dart';
+import 'package:nutri_kids_movil/ui/views/update_user_view.dart';
 import 'package:provider/provider.dart';
 
 class DashboardHandlers {
@@ -94,4 +95,14 @@ class DashboardHandlers {
   },
 );
 
+  static Handler updateUserView = Handler(
+    handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
+      final authProvider = Provider.of<AuthProvider>(context!, listen: false);
+      if(authProvider.authStatus == AuthStatus.notAuthenticated){
+        return LoginView();
+      }
+      // Aquí iría la lógica para retornar la vista de actualizar usuario
+      return UpdateUserView();
+    },
+  );
 }
